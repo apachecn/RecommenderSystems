@@ -21,14 +21,14 @@ object WordCount {
         //     sys.exit()
         // }
 
-        val lines = sc.textFile("file:/opt/git/RecommendedSystem/README.md")
+        val lines = sc.textFile("file:/opt/git/RecommenderSystems/README.md")
         lines.flatMap(_.split(" "))
             .map((_, 1))
             .reduceByKey(_+_)
             .map(x => (x._2, x._1))
             .sortByKey(false)
             .map(x => (x._2, x._1))
-            .saveAsTextFile("file:/opt/git/RecommendedSystem/output/result.log")
+            .saveAsTextFile("file:/opt/git/RecommenderSystems/output/result.log")
 
         // println("this system exit ok!!!")
 

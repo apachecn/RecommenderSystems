@@ -15,7 +15,7 @@ import org.apache.spark.rdd.RDD
  * See LICENSE file for further information.
  * 
  * 参考地址
- * GitHub: 
+ * GitHub: https://github.com/apachecn/RecommenderSystems
  * 推荐系统: http://www.kuqin.com/shuoit/20151202/349305.html
  * ALS说明: http://www.csdn.net/article/2015-05-07/2824641
  */
@@ -107,7 +107,7 @@ object OfflineRecommender {
         // 初始化 SparkContext
         val conf = new SparkConf().setMaster("local").setAppName("OfflineRecommender")
         val sc = new SparkContext(conf)
-        val base = if (args.length > 0) args(0) else "file:/opt/git/RecommendedSystem/"
+        val base = if (args.length > 0) args(0) else "file:/opt/git/RecommenderSystems/"
 
         // 导入数据，获取RDD
         // UserMovies格式： 用户名，电影ID，评分
@@ -119,14 +119,14 @@ object OfflineRecommender {
         preparation(rawUserMoviesData, rawHotMoviesData)
         println("准备完数据")
         // 抽样评估推荐结果
-        model(sc, rawUserMoviesData, rawHotMoviesData)
+        // model(sc, rawUserMoviesData, rawHotMoviesData)
         // 整体推荐评分的评估
-        evaluate(sc,rawUserMoviesData, rawHotMoviesData)
+        // evaluate(sc,rawUserMoviesData, rawHotMoviesData)
 
-        // recommend(sc, rawUserMoviesData, rawHotMoviesData, base)
+        recommend(sc, rawUserMoviesData, rawHotMoviesData, base)
 
         // 每一个 JVM 可能只能激活一个 SparkContext 对象。在创新一个新的对象之前，必须调用 stop() 该方法停止活跃的 SparkContext。
-        // sc.stop()
+        sc.stop()
     }
 
 
