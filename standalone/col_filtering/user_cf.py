@@ -170,7 +170,7 @@ class UserCF(object):
 
 
 if __name__ == '__main__':
-    ratingfile = "C://workspace//data//ml-1m//ml-1m//ratings.dat"
+    ratingfile = "../../data/ratings"
     usercf = UserCF()
     usercf.generate_dataset(ratingfile)
     usercf.calc_user_sim()

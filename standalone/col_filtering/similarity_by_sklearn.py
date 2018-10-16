@@ -11,7 +11,6 @@ from sklearn.externals.joblib import Memory
 from sklearn.datasets import load_svmlight_file
 from sklearn.metrics import jaccard_similarity_score
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.metrics.pairwise import pairwise_distances
 import numpy as np
 
 np.set_printoptions(suppress=True)
@@ -29,7 +28,7 @@ def get_data(filename):
 
 # 计算jaccard 相似度
 def get_jaccard_similarity(X):
-    n = X.shape[1]
+    n = X.T.shape[1]
     similarity = np.zeros([n, n])
     for i in range(n):
         v1 = X.T[i].toarray()
@@ -47,8 +46,12 @@ def get_consine_similarity(X):
     return similarity
 
 
-filename = "C:/dtworkspace/recommand/data/ratingslibsvm"
+filename = "../../data/ratingslibsvm"
 X, y = get_data(filename)
+consine_sim = get_consine_similarity(X)
+print(consine_sim)
+jaccard_sim = get_jaccard_similarity(X)
+print(jaccard_sim)
 
 
 
