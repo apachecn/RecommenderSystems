@@ -53,14 +53,15 @@ object Features{
   def main(args: Array[String]): Unit = {
 
     /**
+      * 如需使用集群模式，修改入参，使用如下命令提交即可
       * 提交命令 spark-submit --master yarn-cluster <ratingsPath> <libSVMOutPath> <dfOutPath> <featureSize>
      */
-    val conf = new SparkConf().setAppName("Features Prepare")
+    val conf = new SparkConf().setAppName("Features Prepare").setMaster("local[*]")
     val sc = new SparkContext(conf)
-    val ratingsPath = args(0)
-    val libSVMOutPath =  args(1)
-    val dfOutPath =  args(2)
-    val featureSize = args(3).toInt
+    val ratingsPath = "..//data//ml-1m//ratings"
+    val libSVMOutPath =  "..//data//libSVMPath"
+    val dfOutPath =  "..//data//DFPath"
+    val featureSize = 3953
 
     val testF = new Features
 
@@ -69,3 +70,4 @@ object Features{
 
   }
 }
+

@@ -21,7 +21,7 @@ class ItemCF {
     val sqlContext = new SQLContext(sc)
     val rdd = sqlContext.read.parquet(featurePath).select("features")
       .rdd.map(x=>x(0).asInstanceOf[org.apache.spark.mllib.linalg.SparseVector])
-      .map(x=>(x.indices))
+      .map(x=>x.indices)
       .zipWithIndex()
       .map(x=>{
         for (i <- x._1) yield {
@@ -104,6 +104,13 @@ class ItemCF {
   }
 
 
+  /**
+    * 载入相似度矩阵
+    * @param sc
+    * @param simPath
+    * @param featruesSize
+    * @return
+    */
   def loadSimMatrix(sc: SparkContext,
                     simPath: String,
                     featruesSize: Int
@@ -130,59 +137,144 @@ class ItemCF {
 
   }
 
-  def predictByMatrix(sc: SparkContext,
-              simMatrix: breeze.linalg.Matrix[Double],
-              featuresSize: Int,
-              featurePath: String,
-              resultPath: String
-             ): Unit ={
-    val rdd = sc.textFile(featurePath)
-      .map(_.split(" "))
-      .map(x=>(x.filter(g=>g.contains(":"))))
-      .map(x=>(x.map(_.split(":")).map(ar => (ar(0).toInt,ar(1).toDouble))))
-      .map(x=>{
-        val idx = x.map(_._1)
-        val v = x.map(_._2)
-        val vec: SparseVector[Double] = new SparseVector(idx, v, featuresSize)
-        vec
-      })
-//      .map(x=>(x.toDenseVector.toDenseMatrix.dot(simMatrix)))
+  /**
+    * 根据Item 编号，从相似矩阵中获取该Item 的相似向量
+    * @param simMatrix
+    * @param itemNum
+    * @return
+    */
+  def getSimVecFromMatrix(simMatrix: SparseMatrix, itemNum: Int):Array[Double] ={
+    val arr1 = for (i <- 0 until itemNum) yield {
+      simMatrix(i, itemNum)
+    }
+    val arr2 = for (i <- itemNum until simMatrix.numRows) yield {
+      simMatrix(itemNum, i)
+    }
+    (arr1 ++ arr2).toArray
   }
+
+  /**
+    * 基于Item 相似度向量 计算推荐单个物品时的得分，输出结果按得分降序排序
+    * @param sc
+    * @param sim
+    * @param featurePath
+    * @return
+    */
+  def predictBySimVecWithLibSVM(sc: SparkContext,
+                                sim: Array[Double],
+                                featurePath: String): RDD[(String, Double)] ={
+    sc.textFile(featurePath).map(_.split(" ")).map(x=>{
+      val id = x(0)
+      var score = 0.0
+      for (i <- 1 until x.length){
+        val idx = x(i).split(":")(0)
+        val value = x(i).split(":")(1)
+        score += value.toDouble * sim(idx.toInt)
+      }
+      (id,score)
+    }).sortBy(_._2,false)
+  }
+
+
+  /**
+    * 基于Item 相似度向量 计算推荐单个物品时的得分，输出结果按得分降序排序
+    * @param sc
+    * @param sim
+    * @param featurePath
+    * @return
+    */
+  def predictBySimVecWithDF(sc: SparkContext,
+                                sim: Array[Double],
+                                featurePath: String): RDD[(String, Double)] ={
+
+    val sqlContext = new SQLContext(sc)
+    sqlContext.read.parquet(featurePath).select("id","features")
+      .rdd.map(x=>{
+        val p = x(0).toString
+        val v = x(1).asInstanceOf[org.apache.spark.mllib.linalg.SparseVector]
+
+        val idxs = v.toSparse.indices
+        val values = v.toSparse.values
+        var score = 0.0
+        for (i <- 0 until idxs.length){
+                score += values(i) * sim(idxs(i))
+        }
+        (p,score)
+      })
+      .sortBy(_._2,false)
+  }
+
 
 
 }
 
 object ItemCF extends ItemCF{
+
+
+
   def main(args: Array[String]): Unit = {
     val conf = new SparkConf().setAppName("utils").setMaster("local[8]")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
 
-    val libsvmFeaturePath = "C:\\workspace\\data\\apacheCN\\libsvmOut"
-    val dfFeaturePath = "C:\\workspace\\data\\apacheCN\\dfOut"
-    val simPath = "C:\\workspace\\data\\apacheCN\\simPath"
+    val libsvmFeaturePath = "..//data//libSVMPath"
+    val dfFeaturePath = "..//data//DFPath"
+    val simPath = "..//data//SimPath"
 
-//    val JaccardSimPath = "..//data//jaccardSim"
-    val CosSimPath = "..//data//cosSim"
     val featureSize = 3953
 
-//
-//    val sim1 = computeJaccardSimWithLibSVM(sc,libsvmFeaturePath)
-//    sim1.entries.take(10)
+    testComputeSim()
+    testSaveAndLoadSimMatrix()
 
-    val sim2 = computeCosSimWithLibSVM(sc,featureSize,libsvmFeaturePath)
-//    sim2.entries.take(10).foreach(println)
-//    saveSimMatrix(sc,simPath,sim2)
 
+    def testComputeSim(): Unit ={
+        println("Test Compute Jaccard Sim With LibSVM ")
+        val sim1 = computeJaccardSimWithLibSVM(sc,libsvmFeaturePath)
+        sim1.entries.take(3).foreach(println)
+
+
+        println("Test Compute Cossin Sim With LibSVM ")
+        val sim2 = computeCosSimWithLibSVM(sc,featureSize,libsvmFeaturePath)
+        sim2.entries.take(3).foreach(println)
+
+        println("Test Compute Jaccard Sim With DataFrame ")
         val sim3 = computeJaccardSimWithDF(sc,dfFeaturePath)
-    sim3.entries.take(10)
+        sim3.entries.take(3).foreach(println)
 
-    val sim4 = computeCosSimWithDF(sc,dfFeaturePath)
-    sim4.entries.take(10)
+        println("Test Compute Cossin Sim With DataFrame ")
+        val sim4 = computeCosSimWithDF(sc,dfFeaturePath)
+        sim4.entries.take(3).foreach(println)
+      }
 
-//    computeItemJaccardSim(sc,featurePath, JaccardSimPath)
-//    computeItemCosSim(sc,100,featurePath, CosSimPath)
-    val simMatrix = loadSimMatrix(sc, simPath, featureSize)
-//    val score = predict()
+
+    def testSaveAndLoadSimMatrix(): Unit ={
+        val sim = computeCosSimWithLibSVM(sc,featureSize,libsvmFeaturePath)
+        saveSimMatrix(sc,simPath,sim)
+
+        println("Save The SimMatrix")
+
+        val simLoad = loadSimMatrix(sc, simPath, featureSize)
+        println(s"Load The SimMatrix. The Row Num Is ${simLoad.numRows}  The Col Num Is ${simLoad.numCols}")
+      }
+
+    def testPredict(): Unit ={
+      val simMatrix = loadSimMatrix(sc, simPath, featureSize)
+      println(s"Load The SimMatrix. The Row Num Is ${simMatrix.numRows}  The Col Num Is ${simMatrix.numCols}")
+
+      val itemNum = 800
+      val simVec = getSimVecFromMatrix(simMatrix,itemNum)
+
+      println("Test Predict By SimVec With LibSVM ")
+      val score1 = predictBySimVecWithLibSVM(sc, simVec, libsvmFeaturePath)
+      score1.take(3).foreach(println)
+
+      println("Test Predict By SimVec With DataFrame ")
+      val score2 = predictBySimVecWithDF(sc, simVec, dfFeaturePath)
+      score2.take(3).foreach(println)
+
+
+
+    }
+
   }
 }

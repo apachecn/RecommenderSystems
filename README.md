@@ -5,10 +5,11 @@
 
 
 # 目录规划
-data 测试用数据集合  
-standalone 相关实践的单机实现版本（主要为python实现）  
-spark 相关实践的spark版本(主要为scala实现)  
-manual 相关资料集合  
+* data 测试用数据集合  
+* standalone 相关实践的单机实现版本（主要为python实现）  
+* spark 相关实践的spark版本(主要为scala实现)  
+ 已经完成特征工程，ItemCF 部分
+* manual 相关资料集合  
 
 # 计划项(恩 就是挖坑的意思)
 ## 推荐算实现
@@ -29,8 +30,6 @@ TagCF
 Markov Chain
 社交网络
 ....
-
-## paper阅读笔记
 
 
 ## 评价系统实现
