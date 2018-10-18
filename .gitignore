@@ -1,2 +1,7 @@
 *.class
 *.log
+/spark/target
+/*/.idea
+/spark/derby.log
+/sparl/*.iml
+/standalone/mycache
