@@ -14,21 +14,21 @@
 # 计划项(恩 就是挖坑的意思)
 ## 推荐算实现
 ### 基于用户行为数据的推荐算法
-ItemCF
-UserCF
-关联规则
-LFM 
-Graph 
-ALS
+ItemCF  
+UserCF  
+关联规则  
+LFM   
+Graph   
+ALS  
 
 ### 利用用户标签数据推荐算法
-LDA
-TFIDF
-TagCF
+LDA  
+TFIDF  
+TagCF  
 
 ## 探索性研究（各个paper的实现）
-Markov Chain
-社交网络
+Markov Chain  
+社交网络  
 ....
 
 
