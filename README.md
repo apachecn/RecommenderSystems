@@ -1,39 +1,48 @@
 # 项目介绍
-项亮的[《推荐系统实践》](https://book.douban.com/subject/10769749/)堪称是推荐系统的经典书籍。
-但因其成书时间较早，当时大数据相关技术并未如当下一样流行，故而书中使用的demo 代码，并不具备在大规模数据集上运行的条件。
-于是萌生了使用Spark，实现相关内容的念头。
+介绍推荐系统基本知识，相关算法以及实现。
 
 
 # 目录规划
-* data 测试用数据集合  
-* standalone 相关实践的单机实现版本（主要为python实现）  
-* spark 相关实践的spark版本(主要为scala实现)  
- 已经完成特征工程，ItemCF 部分
+* data 测试用数据集合 
+* py3.x 相关实践的python 实现
+* spark 相关实践的spark  实现  
 * manual 相关资料集合  
+	* paper阅读分享
+	* 基础知识分享
+
+
+# 内容导航
+## python 实现（主要用于原理理解）
+* ItemCF(使用sklearn 版本和 不适用sklearn版本）
+* UserCF(使用sklearn 版本和 不适用sklearn版本）
+* LFM
+* Graph—Based
+
+## Spark 实现
+* 特征工程
+* ItemCF
 
 # 计划项(恩 就是挖坑的意思)
 ## 推荐算实现
 ### 基于用户行为数据的推荐算法
-ItemCF  
-UserCF  
-关联规则  
-LFM   
-Graph   
-ALS  
+* 关联规则  
+* LFM   
+* Graph   
+* ALS  
 
 ### 利用用户标签数据推荐算法
-LDA  
-TFIDF  
-TagCF  
+* LDA  
+* TFIDF  
+* TagCF  
 
-## 探索性研究（各个paper的实现）
-Markov Chain  
-社交网络  
+### 探索性研究（各个paper的实现）
+* Markov Chain  
+* 社交网络  
+* 基于深度学习的推荐算法
 ....
 
 
 ## 评价系统实现
-
 
 ## 推荐系统架构实现
 ### 外围架构
