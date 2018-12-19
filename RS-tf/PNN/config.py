@@ -1,4 +1,4 @@
-RAIN_FILE = "data/train.csv"
+TRAIN_FILE = "data/train.csv"
 TEST_FILE = "data/test.csv"
 
 SUB_DIR = "output"
