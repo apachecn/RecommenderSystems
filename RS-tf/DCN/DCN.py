@@ -129,6 +129,7 @@ def preprocessing(data):
 
 
 if __name__ == "__main__":
+    #data from kaggle forest cover type dataset
     data = pd.read_csv("data/covtype.csv")
     X, y, inp_layer, inp_embed = feature_generate(data)
     
