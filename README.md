@@ -13,8 +13,8 @@
 
 # 内容导航
 ## python 实现（主要用于原理理解）
-* ItemCF(使用sklearn 版本和 不适用sklearn版本）
-* UserCF(使用sklearn 版本和 不适用sklearn版本）
+* ItemCF(使用sklearn 版本和 不使用sklearn版本）
+* UserCF(使用sklearn 版本和 不使用sklearn版本）
 * LFM
 * Graph—Based
 
@@ -32,7 +32,7 @@
 
 ### 利用用户标签数据推荐算法
 * LDA  
-* TFIDF  
+* TF-IDF  
 * TagCF  
 
 ### 探索性研究（各个paper的实现）
